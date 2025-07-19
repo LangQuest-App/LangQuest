@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { Globe, Menu, X } from 'lucide-react';
+import { Globe, Menu, X, Settings } from 'lucide-react';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -53,6 +54,12 @@ const Navbar = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
+            <Link to="/electron-demo">
+              <Button variant="ghost" className="text-foreground hover:text-primary">
+                <Settings className="h-4 w-4 mr-2" />
+                Electron Demo
+              </Button>
+            </Link>
             <Button variant="ghost" className="text-foreground hover:text-primary">
               Sign In
             </Button>
@@ -89,6 +96,12 @@ const Navbar = () => {
                 </a>
               ))}
               <div className="px-3 py-2 space-y-2">
+                <Link to="/electron-demo" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="ghost" className="w-full text-foreground">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Electron Demo
+                  </Button>
+                </Link>
                 <Button variant="ghost" className="w-full text-foreground">
                   Sign In
                 </Button>
