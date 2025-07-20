@@ -1,6 +1,7 @@
 import { Button } from '../components/ui/button';
 import { ArrowRight, Play, Star } from 'lucide-react';
 import heroImage from '../assets/heroImage.png';
+import frogAnnounce from "/images/frog-announce.png"
 
 const Hero = () => {
   return (
@@ -8,6 +9,7 @@ const Hero = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
+          <img src={frogAnnounce} alt="Hero Image" className="hidden lg:block w-full h-auto rounded-2xl shadow-elegant" />
           <div className="space-y-8 fade-in-up">
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-sm">
@@ -65,14 +67,14 @@ const Hero = () => {
               </div>
             </div>
           </div>
-
+{/*HEX COLR CODE: #45BB19 */}
           {/* Right Content - Hero Image */}
           <div className="relative">
             <div className="relative float-animation">
               <img
-                src={heroImage}
+                src={frogAnnounce}
                 alt="Language learning illustration"
-                className="w-full h-auto rounded-2xl shadow-elegant"
+                className=""
               />
               
               {/* Floating Elements */}

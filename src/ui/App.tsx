@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "../ui/pages/index";
 import NotFound from "./pages/NotFound";
 import ElectronDemo from "./components/ElectronDemo";
+import Hero from "./components/Hero";
 
 const queryClient = new QueryClient();
 
@@ -15,6 +16,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/home" element={<Hero />} />
           <Route path="/electron-demo" element={<ElectronDemo />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

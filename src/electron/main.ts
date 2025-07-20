@@ -152,8 +152,8 @@ app.on("ready", () => {
   const preloadPath = path.resolve(__dirname, "preload.js");
   console.log("Preload script path:", preloadPath);
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1000,
+    height: 700,
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
