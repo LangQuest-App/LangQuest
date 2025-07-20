@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { useUser } from "./lib/contextStores/userStore";
-import Index from "../ui/pages/index";
 import NotFound from "./pages/NotFound";
 import ElectronDemo from "./components/ElectronDemo";
 import Hero from "./components/HomePage";
