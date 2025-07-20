@@ -19,6 +19,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
   setSetting: (key: string, value: any) => ipcRenderer.invoke('settings-set', key, value),
   getAllSettings: () => ipcRenderer.invoke('settings-get-all'),
 
+  // Electron Store
+  store: {
+    get: (key: string) => ipcRenderer.invoke('store-get', key),
+    set: (key: string, value: any) => ipcRenderer.invoke('store-set', key, value),
+    delete: (key: string) => ipcRenderer.invoke('store-delete', key),
+    clear: () => ipcRenderer.invoke('store-clear'),
+    has: (key: string) => ipcRenderer.invoke('store-has', key),
+    getAll: () => ipcRenderer.invoke('store-get-all'),
+  },
+
   // Audio/TTS functionality
   playAudio: (text: string, language: string) => ipcRenderer.invoke('audio-play', text, language),
   stopAudio: () => ipcRenderer.invoke('audio-stop'),

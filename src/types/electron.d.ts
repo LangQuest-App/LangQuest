@@ -15,6 +15,16 @@ export interface IElectronAPI {
   setSetting: (key: string, value: any) => Promise<void>;
   getAllSettings: () => Promise<Record<string, any>>;
 
+  // Electron Store
+  store: {
+    get: (key: string) => Promise<any>;
+    set: (key: string, value: any) => Promise<boolean>;
+    delete: (key: string) => Promise<boolean>;
+    clear: () => Promise<boolean>;
+    has: (key: string) => Promise<boolean>;
+    getAll: () => Promise<Record<string, any>>;
+  };
+
   // Audio/TTS functionality
   playAudio: (text: string, language: string) => Promise<void>;
   stopAudio: () => Promise<void>;

@@ -76,7 +76,7 @@ const LandingPage = () => {
         <div
           className={`transform transition-all duration-1000 delay-600 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
         >
-          <Link to={"/home"} className="group relative inline-block px-12 py-6 bg-gradient-to-b from-green-400 via-emerald-500 to-green-600 text-white font-bold text-xl rounded-2xl shadow-2xl hover:shadow-green-400/40 transition-all duration-300 hover:scale-105 overflow-hidden tracking-wider font-fredoka">
+          <Link to={"/signup"} className="group relative inline-block px-12 py-6 bg-gradient-to-b from-green-400 via-emerald-500 to-green-600 text-white font-bold text-xl rounded-2xl shadow-2xl hover:shadow-green-400/40 transition-all duration-300 hover:scale-105 overflow-hidden tracking-wider font-fredoka">
             {/* Enhanced Glossy overlay effect */}
             <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-white/30 to-white/5 rounded-2xl"></div>
             <div className="absolute top-0 left-0 w-3/4 h-1/2 bg-gradient-to-br from-white/50 to-transparent rounded-tl-2xl"></div>

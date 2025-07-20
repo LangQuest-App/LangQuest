@@ -10,10 +10,14 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import fs from "fs";
+import Store from "electron-store";
 
 // __dirname support (ESM)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Initialize electron-store
+const store = new Store();
 
 // Store for settings (in production, you might want to use a proper database or file)
 const settings: Record<string, any> = {};
@@ -117,6 +121,34 @@ ipcMain.handle("settings-set", async (event, key: string, value: any) => {
 
 ipcMain.handle("settings-get-all", async (event) => {
   return { ...settings };
+});
+
+// Electron Store IPC handlers
+ipcMain.handle("store-get", async (event, key: string) => {
+  return store.get(key);
+});
+
+ipcMain.handle("store-set", async (event, key: string, value: any) => {
+  store.set(key, value);
+  return true;
+});
+
+ipcMain.handle("store-delete", async (event, key: string) => {
+  store.delete(key);
+  return true;
+});
+
+ipcMain.handle("store-clear", async (event) => {
+  store.clear();
+  return true;
+});
+
+ipcMain.handle("store-has", async (event, key: string) => {
+  return store.has(key);
+});
+
+ipcMain.handle("store-get-all", async (event) => {
+  return store.store;
 });
 
 ipcMain.handle("audio-play", async (event, text: string, language: string) => {
