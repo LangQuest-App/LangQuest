@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '../components/ui/button';
-import { Globe, Menu, X, Settings } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { BookOpen, Brain, Target, User } from 'lucide-react';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 30);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -17,101 +16,88 @@ const Navbar = () => {
   }, []);
 
   const navItems = [
-    { name: 'Features', href: '#features' },
-    { name: 'Testimonials', href: '#testimonials' },
-    { name: 'About', href: '#about' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Lessons', href: '/lessons', icon: BookOpen },
+    { name: 'Quiz', href: '/quiz', icon: Brain },
+    { name: 'Practice', href: '/practice', icon: Target },
+    { name: 'Profile', href: '/profile', icon: User },
   ];
 
+  const isActive = (href:any) => location.pathname === href;
+
+  if (location.pathname === '/') {
+    return null;
+  }
+
   return (
-    <nav
-      className={`fixed top-0 w-full z-50 transition-smooth ${
-        isScrolled
-          ? 'bg-background/90 backdrop-blur-md shadow-lg'
-          : 'bg-transparent'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <Globe className="h-8 w-8 text-primary" />
-            <span className="font-bold text-xl text-foreground">LangQuest</span>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="text-foreground hover:text-primary transition-smooth font-medium"
-              >
-                {item.name}
-              </a>
-            ))}
-          </div>
-
-          {/* CTA Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Link to="/electron-demo">
-              <Button variant="ghost" className="text-foreground hover:text-primary">
-                <Settings className="h-4 w-4 mr-2" />
-                Electron Demo
-              </Button>
-            </Link>
-            <Button variant="ghost" className="text-foreground hover:text-primary">
-              Sign In
-            </Button>
-            <Button className="hero-gradient text-primary-foreground shadow-elegant">
-              Start Learning
-            </Button>
-          </div>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-foreground"
-            >
-              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button>
-          </div>
-        </div>
-
-        {/* Mobile menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden bg-background/95 backdrop-blur-md border-t border-border">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              {navItems.map((item) => (
-                <a
+    <nav className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+      <div 
+        className={`transition-all duration-500 ease-out ${
+          isScrolled ? 'scale-95 opacity-90' : 'scale-100 opacity-95'
+        }`}
+      >
+        {/* Main Floating Navbar */}
+        <div className="relative group">
+          {/* Lighter gradient background for glassmorphic effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white/50 via-green-50/80 to-emerald-50/70 rounded-3xl border border-zinc-800 shadow-2xl shadow-black/5"></div>
+          
+          <div className="relative px-6 py-3 flex items-center space-x-6 backdrop-blur-xl">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.href);
+              
+              return (
+                <Link
                   key={item.name}
-                  href={item.href}
-                  className="block px-3 py-2 text-foreground hover:text-primary transition-smooth font-medium"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  to={item.href}
+                  className={`relative group/item transition-all duration-300 ${
+                    active 
+                      ? 'transform scale-110' 
+                      : 'hover:transform hover:scale-105'
+                  }`}
                 >
-                  {item.name}
-                </a>
-              ))}
-              <div className="px-3 py-2 space-y-2">
-                <Link to="/electron-demo" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="ghost" className="w-full text-foreground">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Electron Demo
-                  </Button>
+                  <div className={`relative px-4 py-3 rounded-2xl transition-all duration-300 ${
+                    active
+                      ? 'bg-gradient-to-b from-[#45BB19]/90 via-emerald-400/85 to-green-500/90 shadow-xl shadow-[#45BB19]/20 backdrop-blur-sm'
+                      : 'hover:bg-gradient-to-b hover:from-green-50/60 hover:to-emerald-50/50 hover:shadow-lg hover:backdrop-blur-sm hover:border hover:border-green-100/40'
+                  }`}>
+                    
+                    {/* Active item glossy overlay - lighter and more subtle */}
+                    {active && (
+                      <>
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-white/25 to-transparent rounded-2xl"></div>
+                        <div className="absolute top-0 left-0 w-2/3 h-1/3 bg-gradient-to-br from-white/40 to-transparent rounded-tl-2xl"></div>
+                        <div className="absolute inset-0 rounded-2xl shadow-inner shadow-green-900/5"></div>
+                      </>
+                    )}
+                    
+                    <div className="relative flex flex-col items-center space-y-1.5">
+                      <Icon className={`h-6 w-6 transition-colors duration-300 ${
+                        active 
+                          ? 'text-white drop-shadow-sm' 
+                          : 'text-gray-600 group-hover/item:text-[#45BB19]'
+                      }`} />
+                      <span className={`text-xs font-medium transition-colors duration-300 ${
+                        active 
+                          ? 'text-white drop-shadow-sm' 
+                          : 'text-gray-700 group-hover/item:text-[#45BB19]'
+                      }`}>
+                        {item.name}
+                      </span>
+                    </div>
+                    
+                    {/* Active indicator dot - lighter and more elegant */}
+                    {active && (
+                      <div className="absolute -top-1.5 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gradient-to-r from-white to-green-100 rounded-full shadow-lg border border-white/60"></div>
+                    )}
+                  </div>
                 </Link>
-                <Button variant="ghost" className="w-full text-foreground">
-                  Sign In
-                </Button>
-                <Button className="w-full hero-gradient text-primary-foreground">
-                  Start Learning
-                </Button>
-              </div>
-            </div>
+              );
+            })}
           </div>
-        )}
+          
+          {/* Bottom shadow for depth */}
+          <div className="absolute -bottom-2 left-2 right-2 h-4 bg-gradient-to-b from-black/5 to-transparent rounded-full blur-md"></div>
+        </div>       
       </div>
     </nav>
   );
