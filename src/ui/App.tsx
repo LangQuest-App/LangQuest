@@ -10,6 +10,7 @@ import Hero from "./components/HomePage";
 import Auth from "./components/Auth/Auth";
 import Navbar from "./components/Navbar";
 import LandingPage from "./components/LandingPage";
+import Lesson from "./components/Lesson";
 
 const queryClient = new QueryClient();
 
@@ -20,7 +21,7 @@ const AppContent = () => {
     const initializeUser = async () => {
       try {
         await setUserData();
-        console.log('User data initialized on app mount');
+        console.log('User data initialized on app mount', userData);
       } catch (error) {
         console.error('Error initializing user data:', error);
       }
@@ -41,6 +42,7 @@ const AppContent = () => {
         <Route path="/home" element={<Hero />} />
         <Route path="/signup" element={<Auth />} />
         <Route path="/electron-demo" element={<ElectronDemo />} />
+        <Route path="/lessons" element={<Lesson />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
