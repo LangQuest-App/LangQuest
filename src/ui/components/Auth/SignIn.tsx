@@ -1,25 +1,34 @@
 import { useState, useEffect } from "react"
 import { Eye, EyeOff, ArrowRight, Mail, Lock } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import FrogFront from "/images/frog-front.png"
 import store from '../../utils/electron-store'
+import { useUser } from "@/ui/lib/contextStores/userStore"
 
 interface SignInProps {
     toggleState: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const SignIn = ({toggleState}:SignInProps) => {
+  const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const {userData} = useUser()
   const [formData, setFormData] = useState({
     email: "",
     password: ""
   })
-
   useEffect(() => {
     setIsVisible(true)
   }, [])
+  
+  useEffect(() => {
+    if (userData?.isLoggedIn) {
+      navigate("/home");
+    }
+  }, [])
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -37,7 +46,8 @@ const SignIn = ({toggleState}:SignInProps) => {
       console.log("Sign in form submitted:", formData)
       await new Promise(resolve => setTimeout(resolve, 1000))
       await saveUserDataToStore(formData)
-      window.location.href = '/home'
+
+      navigate("/home");
     } catch (error) {
       console.error('Sign in error:', error)
       alert('Sign in failed. Please try again.')

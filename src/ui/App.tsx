@@ -1,7 +1,7 @@
 import { Toaster as Sonner } from "../ui/components/ui/sonner";
 import { TooltipProvider } from "../ui/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { useUser } from "./lib/contextStores/userStore";
 import NotFound from "./pages/NotFound";
@@ -51,9 +51,9 @@ const AppContent = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <BrowserRouter>
+      <HashRouter>
         <AppContent />
-      </BrowserRouter>
+      </HashRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );

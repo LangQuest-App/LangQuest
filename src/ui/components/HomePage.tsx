@@ -1,11 +1,12 @@
-import React from "react";
 import { ArrowRight, Play, Star, Zap } from "lucide-react";
 import FrogBook from  "/images/frog-book.png"
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 overflow-hidden relative">
       {/* Enhanced Floating Background Elements */}
+  
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Wider gradient orbs */}
         <div className="absolute -top-60 -right-60 w-[800px] h-[800px] bg-gradient-to-br from-green-400/30 to-emerald-500/20 rounded-full blur-3xl animate-pulse"></div>
@@ -60,6 +61,7 @@ const Hero = () => {
                   <Play className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform inline" />
                   Watch Demo
                 </button>
+                    <Link to="/" className="absolute inset-0 z-10"> back to home</Link>
               </div>
 
               {/* Enhanced Stats */}
