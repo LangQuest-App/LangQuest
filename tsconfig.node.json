@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
+    "incremental": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-    "target": "ES2023",
+    "target": "ES2022",
     "lib": ["ES2023"],
     "module": "ESNext",
     "skipLibCheck": true,
@@ -17,9 +18,8 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    // Removed unsupported options for TS 5.3.x
   },
   "include": ["vite.config.ts"]
 }

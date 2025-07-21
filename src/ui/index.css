@@ -1,6 +1,15 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Custom Font Face */
+@font-face {
+  font-family: "Fredoka";
+  src: url("/fonts/Fredoka-VariableFont_wdth,wght.ttf") format("truetype");
+  font-weight: 300 900; /* Variable font weight range */
+  font-stretch: 75% 125%; /* Variable font width range */
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -8,6 +17,14 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  
+  /* Custom Font Families */
+  --font-family-fredoka: "Fredoka", ui-sans-serif, system-ui, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  
+  /* Font Family Utilities */
+  --font-family-sans: "Fredoka", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-family-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-family-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -212,7 +229,7 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    /* font-family: "Fredoka", 'Inter', system-ui, -apple-system, sans-serif; */
   }
 }
 
@@ -247,6 +264,17 @@
   
   .scroll-smooth {
     animation: scroll 20s linear infinite;
+  }
+
+  /* Custom Font Utilities */
+  .font-fredoka {
+    font-family: var(--font-family-fredoka);
+  }
+  
+  .font-fredoka-heading {
+    font-family: var(--font-family-fredoka);
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
 }
 
