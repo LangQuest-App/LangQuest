@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { Eye, EyeOff, ArrowRight, User, Mail, Lock } from "lucide-react"
-import { Link } from "react-router-dom"
 import FrogWave from "/images/frog-wave.png"
-import BackToHome from "../BackToHome"
+import BackToHome from "../Buttons/BackToHome"
 
 interface SignUpProps {
     toggleState: React.Dispatch<React.SetStateAction<boolean>>

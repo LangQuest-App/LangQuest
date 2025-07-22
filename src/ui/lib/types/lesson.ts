@@ -11,6 +11,7 @@ export type LessonQuestion = {
 // Use it for the questions array
 export type Lesson = {
   id: string;
+  attempted:boolean;
   userId: string;
   title: string;
   questions: LessonQuestion[];

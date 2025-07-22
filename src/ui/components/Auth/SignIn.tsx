@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom"
 import FrogFront from "/images/frog-front.png"
 import store from '../../utils/electron-store'
 import { useUser } from "@/ui/lib/contextStores/userStore"
-import BackToHome from "../BackToHome"
+import BackToHome from "../Buttons/BackToHome"
 
 interface SignInProps {
     toggleState: React.Dispatch<React.SetStateAction<boolean>>

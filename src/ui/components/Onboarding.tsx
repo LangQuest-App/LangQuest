@@ -13,6 +13,7 @@ const Onborading = () => {
     options: string[];
   }
   const navigate = useNavigate();
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL!;
   const [preferences, setPreferences] = React.useState<IUserPreference>({
     native_lang: "",
     language_to_learn: "",
@@ -21,9 +22,8 @@ const Onborading = () => {
     prefered_way: "",
   });
   const [stage, setStage] = React.useState(0);
-  const [currentQuestion, setCurrentQuestion] = React.useState<questionType[]>(
-    []
-  );
+  const [currentQuestion, setCurrentQuestion] = React.useState<questionType[]>([]);
+  const [isGenerating, setIsGenerating] = React.useState(false);
   const { setUserPreference } = useUser();
 
   useEffect(() => {
@@ -54,14 +54,32 @@ const Onborading = () => {
       [key]: value,
     }));
   };
-
+const generateLessons = async (preferences:any) => {
+    try {
+      console.log("calling api to generate lessons");
+      const response = await window.electronAPI.fetchData(
+        `${BACKEND_URL}/lesson/generate`,
+        preferences,
+        'POST'
+      );
+      if( response.status !== 200) {
+        throw new Error("Failed to fetch lessons");
+      }
+      console.log("Lessons fetched successfully:", response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error fetching lesson:', error);
+    }
+  };
+  
   const handleSubmission = async () => {
+    setIsGenerating(true);
     await setUserPreference(preferences);
-    // add zod validation here 
     console.log("Preferences submitted:", preferences);
-    // AXIOS
+    await generateLessons(preferences);
     setTimeout(() => {
       console.log("Updating the db with preferences");
+      setIsGenerating(false);
       navigate("/home");
     }, 2000);
   };
@@ -123,34 +141,42 @@ const Onborading = () => {
           </div>
         ))}
         <div className="flex gap-8 justify-center mt-8">
-          <button
-            onClick={handlePrevious}
-            disabled={stage === 0}
-            className={`w-16 h-16 rounded-full flex items-center justify-center bg-[#44bb1937] hover:bg-green-400/30  active:bg-green-400/30  shadow-lg backdrop-blur-md transition-all duration-300 border-2 border-emerald-300 ${
-              stage === 0 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            aria-label="Previous"
-            style={{ boxShadow: "0 4px 24px 0 rgba(16,185,129,0.15)" }}
-          >
-            <ArrowLeft className="w-8 h-8 text-emerald-700" />
-          </button>
-          <button
-            onClick={handleNext}
-            className="w-16 h-16 rounded-full flex items-center justify-center bg-[#44bb1937] hover:bg-green-400/30  active:bg-green-400/30 shadow-lg backdrop-blur-md transition-all duration-300 border-2 border-green-300 ${stage === 0 ? 'opacity-50 cursor-not-allowed' : ''}"
-            aria-label={stage < questions.length - 1 ? "Next" : "Finish"}
-            style={{ boxShadow: "0 4px 24px 0 rgba(16,185,129,0.15)" }}
-          >
-            {stage < questions.length - 1 ? (
-              <ArrowRight className="w-8 h-8 text-emerald-700" />
-            ) : (
-              <span
-                onClick={() => handleSubmission()}
-                className="font-bold text-3xl text-emerald-700"
+          {isGenerating ? (
+            <div className="w-full flex items-center justify-center">
+              <span className="text-3xl font-bold text-green-700 animate-pulse">Generating lessons...</span>
+            </div>
+          ) : (
+            <>
+              <button
+                onClick={handlePrevious}
+                disabled={stage === 0}
+                className={`w-16 h-16 rounded-full flex items-center justify-center bg-[#44bb1937] hover:bg-green-400/30  active:bg-green-400/30  shadow-lg backdrop-blur-md transition-all duration-300 border-2 border-emerald-300 ${
+                  stage === 0 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                aria-label="Previous"
+                style={{ boxShadow: "0 4px 24px 0 rgba(16,185,129,0.15)" }}
               >
-                ✓
-              </span>
-            )}
-          </button>
+                <ArrowLeft className="w-8 h-8 text-emerald-700" />
+              </button>
+              <button
+                onClick={handleNext}
+                className="w-16 h-16 rounded-full flex items-center justify-center bg-[#44bb1937] hover:bg-green-400/30  active:bg-green-400/30 shadow-lg backdrop-blur-md transition-all duration-300 border-2 border-green-300 ${stage === 0 ? 'opacity-50 cursor-not-allowed' : ''}"
+                aria-label={stage < questions.length - 1 ? "Next" : "Finish"}
+                style={{ boxShadow: "0 4px 24px 0 rgba(16,185,129,0.15)" }}
+              >
+                {stage < questions.length - 1 ? (
+                  <ArrowRight className="w-8 h-8 text-emerald-700" />
+                ) : (
+                  <span
+                    onClick={() => handleSubmission()}
+                    className="font-bold text-3xl text-emerald-700"
+                  >
+                    ✓
+                  </span>
+                )}
+              </button>
+            </>
+          )}
         </div>
         {/* FrogSide Image absolutely to the right of the question/options */}
         <img

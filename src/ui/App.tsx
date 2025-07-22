@@ -15,7 +15,7 @@ import Lesson from "./components/Lesson";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const { userData, setUserData } = useUser();
+  const { userData, setUserData, isLoaded } = useUser();
 
   useEffect(() => {
     const initializeUser = async () => {
@@ -29,7 +29,9 @@ const AppContent = () => {
 
     initializeUser();
   }, [setUserData]);
-
+ 
+  if (!isLoaded) return null;
+ 
   return (
     <>
     {
