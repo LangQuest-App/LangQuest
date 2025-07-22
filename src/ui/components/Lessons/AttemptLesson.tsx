@@ -46,7 +46,7 @@ const AttemptLesson = ({ lesson }: any) => {
   const q = questions[current];
 
   if (current >= questions.length) {
-    return <LessonCompletion score={score} total={questions.length} wrongQuestions={wrongQuestions} />;
+    return <LessonCompletion score={score} lesson_id={lesson.id} total={questions.length} wrongQuestions={wrongQuestions} />;
   }
 
   return (

@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import { useUser } from "../lib/contextStores/userStore";
-import Onborading from "./Onboarding";
-import LessonList from "./Lessons/LessonList";
-import BackToHome from "./Buttons/BackToHome";
+import { useUser } from "../../lib/contextStores/userStore";
+import Onborading from "../Onboarding";
+import LessonList from "./LessonList";
+import BackToHome from "../Buttons/BackToHome";
 
 const Lesson = () => {
   const { userData } = useUser();
