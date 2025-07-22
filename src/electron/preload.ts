@@ -11,9 +11,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   showSaveDialog: (options?: any) => 
     ipcRenderer.invoke('file-save-dialog', options).catch(() => null),
 
-  // Theme management
-// 
-
+  // API calling
+  fetchData: (url:string,data:any,method:string) => ipcRenderer.invoke('fetch-data', {url,data,method}),
   // Settings (localstorage-types)
   getSetting: (key: string) => ipcRenderer.invoke('settings-get', key),
   setSetting: (key: string, value: any) => ipcRenderer.invoke('settings-set', key, value),

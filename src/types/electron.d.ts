@@ -35,6 +35,9 @@ export interface IElectronAPI {
   // External links
   openExternal: (url: string) => Promise<void>;
 
+  // Data fetching
+  fetchData: (url: string, data: any, method: string) => Promise<any>;
+
 }
 
 declare global {

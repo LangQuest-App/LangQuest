@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom"
 import FrogFront from "/images/frog-front.png"
 import store from '../../utils/electron-store'
 import { useUser } from "@/ui/lib/contextStores/userStore"
+import BackToHome from "../BackToHome"
 
 interface SignInProps {
     toggleState: React.Dispatch<React.SetStateAction<boolean>>
@@ -105,13 +106,7 @@ const SignIn = ({toggleState}:SignInProps) => {
       {/* Main Content */}
       <div className="relative z-10 flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8 py-12">
         
-        {/* Back to Home Link - Top Left */}
-        <Link 
-          to="/" 
-          className="absolute top-6 left-6 inline-flex items-center text-green-500 hover:text-green-600 font-fredoka font-semibold transition-colors duration-300 z-30"
-        >
-          ← Back to Home
-        </Link>
+        <BackToHome/>
         
         {/* Container for Frog and Form - Side by Side */}
         <div className="flex flex-col lg:flex-row items-center justify-center max-w-6xl mx-auto w-full gap-10 lg:gap-24 relative">

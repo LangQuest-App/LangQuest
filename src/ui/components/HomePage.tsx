@@ -1,6 +1,7 @@
 import { ArrowRight, Play, Star, Zap } from "lucide-react";
 import FrogBook from  "/images/frog-book.png"
 import { Link } from "react-router-dom";
+import BackToHome from "./BackToHome";
 
 const Hero = () => {
   return (
@@ -18,12 +19,7 @@ const Hero = () => {
         <div className="absolute top-3/4 right-1/3 w-3 h-3 bg-emerald-300/50 rounded-full animate-bounce delay-700"></div>
         <div className="absolute top-1/2 left-3/4 w-1.5 h-1.5 bg-teal-400/60 rounded-full animate-bounce delay-1100"></div>
       </div>
-      <Link
-        to="/"
-        className="bg-[#45BB19] px-4 py-2 rounded-2xl font-semibold text-white text-lg shadow hover:shadow-green-500/30 transition-all duration-300 hover:scale-105 w-fit h-fit"
-      >
-        Back to Home
-      </Link>
+     <BackToHome/>
       <section className="min-h-screen flex items-center justify-center pt-16 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="grid lg:grid-cols-2 gap-16 items-center">

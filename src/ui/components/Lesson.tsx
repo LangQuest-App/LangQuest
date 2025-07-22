@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
 import { useUser } from "../lib/contextStores/userStore";
 import Onborading from "./Onboarding";
+import LessonList from "./Lessons/LessonList";
+import BackToHome from "./BackToHome";
+
 const Lesson = () => {
   const { userData } = useUser();
   const [showOnboarding, setShowOnboarding] = React.useState(false);
@@ -14,13 +16,10 @@ const Lesson = () => {
   }, [userData]);
   return (
     <div>
-      <Link to="/home" className="absolute z-100 top-4 left-4">
-        <button className="bg-[#a1e788] text-white px-4 py-2 rounded-lg font-semibold text-base shadow hover:bg-[#369a14] transition">
-          Back to home
-        </button>
-      </Link>
+      <BackToHome/>
       {showOnboarding && <Onborading />}
-      {!showOnboarding && <div>Lessons comming soon...</div>}
+      {!showOnboarding && <LessonList/>}
+
     </div>
   );
 };
