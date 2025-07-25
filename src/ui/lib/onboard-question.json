@@ -1,0 +1,34 @@
+[
+  {
+    "question": "What is your native language?",
+    "type": "select",
+    "options": ["English", "Bengali", "Hindi", "Italian", "Other"]
+  },
+  {
+    "question": "Which language do you want to learn?",
+    "type": "select",
+    "options": ["English", "Bengali", "Hindi", "Italian", "Other"]
+  },
+  {
+    "question": "How would you rate your current level in this language?",
+    "type": "radio",
+    "options": ["Complete Beginner", "Beginner", "Intermediate", "Advanced"]
+  },
+  {
+    "question": "What is your main goal for learning this language?",
+    "type": "select",
+    "options": [
+      "Daily conversations",
+      "Travel",
+      "Work or Business",
+      "Academic learning",
+      "Understanding songs/movies",
+      "Other"
+    ]
+  },
+  {
+    "question": "Would you prefer a focus on pronunciation or word usage?",
+    "type": "radio",
+    "options": ["Pronunciation", "Word meaning", "Both equally"]
+  }
+]

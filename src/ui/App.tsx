@@ -5,23 +5,29 @@ import { HashRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { useUser } from "./lib/contextStores/userStore";
 import NotFound from "./pages/NotFound";
-import ElectronDemo from "./components/ElectronDemo";
+// import ElectronDemo from "./components/ElectronDemo";
 import Hero from "./components/HomePage";
 import Auth from "./components/Auth/Auth";
 import Navbar from "./components/Navbar";
 import LandingPage from "./components/LandingPage";
+<<<<<<< HEAD
 import Scene from "./components/SceneNew";
+=======
+import Lesson from "./components/Lessons/Lesson";
+import Practice from "./components/Quiz/Practice";
+import Profile from "./components/Profile/Profile";
+>>>>>>> 2a27b05dc04f9d445d062f91a3e06493943899f3
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const { userData, setUserData } = useUser();
+  const { userData, setUserData, isLoaded } = useUser();
 
   useEffect(() => {
     const initializeUser = async () => {
       try {
         await setUserData();
-        console.log('User data initialized on app mount');
+        console.log('User data initialized on app mount', userData);
       } catch (error) {
         console.error('Error initializing user data:', error);
       }
@@ -29,7 +35,9 @@ const AppContent = () => {
 
     initializeUser();
   }, [setUserData]);
-
+ 
+  if (!isLoaded) return null;
+ 
   return (
     <>
     {
@@ -41,8 +49,15 @@ const AppContent = () => {
         <Route path="/" element={<LandingPage />} />
         <Route path="/home" element={<Hero />} />
         <Route path="/signup" element={<Auth />} />
+<<<<<<< HEAD
         <Route path="/scene" element={<Scene />} />
         <Route path="/electron-demo" element={<ElectronDemo />} />
+=======
+        {/* <Route path="/electron-demo" element={<ElectronDemo />} /> */}
+        <Route path="/lessons" element={<Lesson />} />
+        <Route path="/quiz" element={<Practice />} />
+        <Route path="/profile" element={<Profile />} />
+>>>>>>> 2a27b05dc04f9d445d062f91a3e06493943899f3
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

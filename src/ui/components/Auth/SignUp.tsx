@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { Eye, EyeOff, ArrowRight, User, Mail, Lock } from "lucide-react"
-import { Link } from "react-router-dom"
 import FrogWave from "/images/frog-wave.png"
+import BackToHome from "../Buttons/BackToHome"
 
 interface SignUpProps {
     toggleState: React.Dispatch<React.SetStateAction<boolean>>
@@ -71,12 +71,7 @@ const SignUp = ({toggleState}:SignUpProps) => {
       <div className="relative z-10 flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8 py-12">
         
         {/* Back to Home Link - Top Left */}
-        <Link 
-          to="/" 
-          className="absolute top-6 left-6 inline-flex items-center text-green-500 hover:text-green-600 font-fredoka font-semibold transition-colors duration-300 z-30"
-        >
-          ← Back to Home
-        </Link>
+        <BackToHome/>
         
         {/* Container for Frog and Form - Side by Side */}
         <div className="flex flex-col lg:flex-row items-center justify-center max-w-6xl mx-auto w-full gap-6 lg:gap-12 relative">
