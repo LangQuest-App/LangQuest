@@ -11,10 +11,18 @@ import {
   Volume2, 
   Loader2,
   SkipForward,
-  RotateCcw 
+  RotateCcw,
+  Home,
+  ArrowLeft,
+  Trophy,
+  Sparkles,
+  Heart,
+  Star,
+  CheckCircle
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { speechRecognitionService } from '../utils/speechRecognition'
+import { Link } from 'react-router-dom'
+import { speechRecognitionService } from '../utils/speechRecognitionService'
 
 // Types matching the backend API response
 interface ScriptLine {
@@ -106,184 +114,138 @@ const Scene: React.FC = () => {
       
       setSceneData(data)
       setCurrentLineIndex(0)
+      setUserResponse('')
+      setInterimTranscript('')
       setIsWaitingForResponse(false)
-      
-      // Don't automatically play audio - wait for user to click play button
-      console.log('Scene loaded - ready for user interaction')
 
     } catch (error) {
       console.error('Error fetching scene:', error)
-      toast.error('Failed to fetch scene data')
+      toast.error('Failed to load scene. Please try again.')
     }
   }
 
-  // Play current line audio
-  const playCurrentLine = useCallback(async () => {
-    if (!currentLine || isPlaying) return
-
-    // Stop any currently playing audio first
-    if (currentAudio) {
-      currentAudio.pause()
-      currentAudio.currentTime = 0
-      currentAudio.onended = null
-      currentAudio.onerror = null
-    }
-
-    setIsPlaying(true)
-    setIsWaitingForResponse(false)
-    setIsRecording(false) // Stop any ongoing recording
+  // Handle audio playback
+  const handlePlay = useCallback(async () => {
+    if (!currentLine?.voiceUrl || isPlaying) return
 
     try {
-      console.log('Playing audio:', currentLine.voiceUrl)
+      // Stop any currently playing audio
+      if (currentAudio) {
+        currentAudio.pause()
+        currentAudio.currentTime = 0
+      }
+
+      setIsPlaying(true)
       const audio = new Audio(currentLine.voiceUrl)
       setCurrentAudio(audio)
 
       audio.onended = () => {
         setIsPlaying(false)
         setCurrentAudio(null)
-        console.log('Audio ended - waiting for user action')
-        // Don't automatically start recording - wait for user to click
+        // Start waiting for user response after audio finishes
+        setIsWaitingForResponse(true)
       }
 
-      audio.onerror = () => {
+      audio.onerror = (e) => {
+        console.error('Audio playback error:', e)
         setIsPlaying(false)
         setCurrentAudio(null)
-        toast.error('Audio Error: Failed to play audio.')
+        toast.error('Failed to play audio')
       }
 
       await audio.play()
     } catch (error) {
+      console.error('Error playing audio:', error)
       setIsPlaying(false)
       setCurrentAudio(null)
-      console.error('Error playing audio:', error)
-      toast.error('Playback Error: Could not play audio file')
+      toast.error('Failed to play audio')
     }
-  }, [currentLine, isPlaying, currentAudio, isRecording])
+  }, [currentLine?.voiceUrl, currentAudio, isPlaying])
 
-  // Start recording user response
-  const startRecording = async () => {
-    if (!speechRecognitionService.isSupported()) {
-      toast.error('Not Supported: Speech recognition is not supported in this browser')
-      return
-    }
+  // Handle recording
+  const handleRecord = useCallback(async () => {
+    if (isRecording) {
+      // Stop recording
+      try {
+        speechRecognitionService.stopRecording()
+        setIsRecording(false)
+      } catch (error) {
+        console.error('Error stopping recording:', error)
+        toast.error('Failed to stop recording')
+      }
+    } else {
+      // Start recording
+      try {
+        setIsRecording(true)
+        setInterimTranscript('')
+        setUserResponse('')
+        setIsWaitingForResponse(false)
 
-    // Stop any playing audio before starting recording
-    if (currentAudio && isPlaying) {
-      currentAudio.pause()
-      currentAudio.currentTime = 0
-      setIsPlaying(false)
-    }
-
-    setIsRecording(true)
-    setUserResponse('')
-    setInterimTranscript('')
-    setIsWaitingForResponse(true)
-
-    try {
-      await speechRecognitionService.startRecording(
-        'en-US', // You can make this dynamic based on the scene language
-        (transcript: string, isFinal: boolean) => {
-          if (isFinal) {
-            setUserResponse(transcript)
+        speechRecognitionService.startRecording(
+          'en-US',
+          (transcript: string, isFinal: boolean) => {
+            if (isFinal) {
+              setUserResponse(transcript)
+              setInterimTranscript('')
+              setIsRecording(false)
+              setIsWaitingForResponse(false)
+              toast.success('Response recorded successfully!')
+            } else {
+              setInterimTranscript(transcript)
+            }
+          },
+          (error: string) => {
+            console.error('Speech recognition error:', error)
             setIsRecording(false)
             setInterimTranscript('')
-            
-            console.log('User response recorded:', transcript)
-            toast.success(`Response Recorded: You said: "${transcript}"`)
-
-            // Move to next line after recording
-            setTimeout(() => {
-              if (!isPlaying) { // Only move to next if not currently playing
-                nextLine()
-              }
-            }, 1500)
-          } else {
-            setInterimTranscript(transcript)
+            setIsWaitingForResponse(false)
+            toast.error('Speech recognition failed. Please try again.')
           }
-        },
-        (error: string) => {
-          setIsRecording(false)
-          setInterimTranscript('')
-          toast.error(`Recording Error: ${error}`)
-        }
-      )
-    } catch (error) {
-      setIsRecording(false)
-      console.error('Failed to start recording:', error)
+        )
+      } catch (error) {
+        console.error('Error starting recording:', error)
+        setIsRecording(false)
+        toast.error('Failed to start recording')
+      }
     }
-  }
+  }, [isRecording])
 
-  // Stop recording
-  const stopRecording = () => {
-    speechRecognitionService.stopRecording()
-    setIsRecording(false)
-    setInterimTranscript('')
-    setIsWaitingForResponse(false)
-  }
+  // Handle next line
+  const handleNext = useCallback(() => {
+    if (!sceneData) return
 
-  // Move to next line
-  const nextLine = () => {
-    if (isLastLine) {
-      toast.success('Scene Complete! Congratulations! You completed the scene.')
-      return
+    if (currentLineIndex < sceneData.scriptLines.length - 1) {
+      setCurrentLineIndex(prev => prev + 1)
+      setUserResponse('')
+      setInterimTranscript('')
+      setIsWaitingForResponse(false)
+      toast.success('Moving to next line!')
+    } else {
+      toast.success('Scene completed! Great job!')
     }
+  }, [sceneData, currentLineIndex])
 
-    // Clean up current audio
-    if (currentAudio) {
-      currentAudio.pause()
-      currentAudio.currentTime = 0
-      currentAudio.onended = null
-      currentAudio.onerror = null
-    }
-
-    // Stop any ongoing recording
-    if (isRecording) {
-      speechRecognitionService.stopRecording()
-    }
-
-    setCurrentLineIndex(prev => prev + 1)
-    setUserResponse('')
-    setIsWaitingForResponse(false)
-    setIsPlaying(false)
-    setIsRecording(false)
-    setCurrentAudio(null)
-    
-    // Don't automatically play next line - wait for user to click play button
-    console.log('Moved to next line - ready for user interaction')
-  }
-
-  // Restart scene
-  const restartScene = () => {
-    // Clean up current audio
-    if (currentAudio) {
-      currentAudio.pause()
-      currentAudio.currentTime = 0
-      currentAudio.onended = null
-      currentAudio.onerror = null
-    }
-
-    // Stop any ongoing recording
-    if (isRecording) {
-      speechRecognitionService.stopRecording()
-    }
-
+  // Reset scene
+  const resetScene = useCallback(() => {
     setCurrentLineIndex(0)
     setUserResponse('')
+    setInterimTranscript('')
     setIsWaitingForResponse(false)
+    if (currentAudio) {
+      currentAudio.pause()
+      currentAudio.currentTime = 0
+    }
+    setCurrentAudio(null)
     setIsPlaying(false)
     setIsRecording(false)
-    setCurrentAudio(null)
-    
-    // Don't automatically play audio - wait for user to click play button
-    console.log('Scene restarted - ready for user interaction')
-  }
+    toast.info('Scene reset to beginning')
+  }, [currentAudio])
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (currentAudio) {
         currentAudio.pause()
-        currentAudio.currentTime = 0
         currentAudio.onended = null
         currentAudio.onerror = null
       }
@@ -291,222 +253,366 @@ const Scene: React.FC = () => {
         speechRecognitionService.stopRecording()
       }
     }
-  }, [])
+  }, [currentAudio, isRecording])
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-blue-600 mb-4">
-          Language Practice Scene
-        </h1>
-        <p className="text-gray-600 mb-8">
-          Enter a language to generate an interactive conversation scene
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+      {/* Background pattern */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(69,187,25,0.08),transparent_50%)] pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(16,185,129,0.08),transparent_50%)] pointer-events-none"></div>
+      
+      {/* Navigation Header */}
+      <div className="relative z-10 p-6">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <Link to="/home" className="group">
+            <button className="group relative bg-white/90 backdrop-blur-sm text-[#45BB19] px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-green-500/20 transition-all duration-300 hover:scale-105 border border-green-100/40">
+              {/* Glossy overlay effect */}
+              <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/20 to-transparent rounded-xl"></div>
+              <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-t-xl"></div>
+              
+              <span className="relative flex items-center">
+                <Home className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
+                Back to Home
+              </span>
+            </button>
+          </Link>
+          
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-[#45BB19] via-emerald-500 to-green-600 bg-clip-text text-transparent">
+            🐸 Practice Scene
+          </h1>
+          
+          <div className="w-32"></div> {/* Spacer for centering */}
+        </div>
       </div>
 
-      {!sceneData ? (
-        /* Language Input Section */
-        <Card className="max-w-md mx-auto">
-          <CardHeader>
-            <CardTitle>Choose Your Language</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Input
-              type="text"
-              placeholder="e.g., Spanish, French, German"
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleGenerateScene()}
-              disabled={isGenerating}
-            />
-            <Button 
-              onClick={handleGenerateScene}
-              disabled={isGenerating || !language.trim()}
-              className="w-full"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating Scene...
-                </>
-              ) : (
-                'Generate Scene'
-              )}
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        /* Practice Session */
-        <div className="space-y-6">
-          {/* Scene Header */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-2xl">{sceneData.title}</CardTitle>
-                  <p className="text-muted-foreground mt-1">{sceneData.description}</p>
-                </div>
-                <Badge variant="secondary" className="text-lg px-3 py-1">
-                  {sceneData.language}
-                </Badge>
-              </div>
-              <div className="mt-4">
-                <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
-                  <span>Progress</span>
-                  <span>{currentLineIndex + 1} / {sceneData.scriptLines.length}</span>
-                </div>
-                <Progress value={progress} className="h-2" />
-              </div>
-            </CardHeader>
-          </Card>
-
-          {/* Current Line Display */}
-          {currentLine && (
-            <Card className="border-2 border-primary/20">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <Volume2 className="h-5 w-5" />
-                    {currentLine.speaker}
+      <div className="relative z-10 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          {!sceneData ? (
+            // Language Input Section
+            <div className="max-w-2xl mx-auto mt-12">
+              <Card className="bg-white/80 backdrop-blur-sm border-green-200/50 shadow-2xl">
+                <CardHeader className="text-center pb-6">
+                  <CardTitle className="text-3xl font-bold bg-gradient-to-r from-[#45BB19] via-emerald-500 to-green-600 bg-clip-text text-transparent">
+                    🎭 Practice Scene Generator
                   </CardTitle>
-                  <Badge variant="outline">
-                    Line {currentLine.order}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-lg">
-                  "{currentLine.text} {currentLine.answer}"
-                </div>
+                  <p className="text-gray-600 mt-2">
+                    Enter a language to generate an interactive conversation scene
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-3">
+                    <label htmlFor="language" className="block text-sm font-semibold text-gray-700">
+                      Target Language
+                    </label>
+                    <Input
+                      id="language"
+                      type="text"
+                      value={language}
+                      onChange={(e) => setLanguage(e.target.value)}
+                      placeholder="e.g., Spanish, French, German, Japanese..."
+                      className="text-lg p-4 border-2 border-green-200 focus:border-[#45BB19] rounded-xl transition-colors"
+                      disabled={isGenerating}
+                    />
+                  </div>
 
-                {/* Control Buttons */}
-                <div className="flex flex-wrap gap-2">
                   <Button
-                    onClick={playCurrentLine}
-                    disabled={isPlaying}
-                    variant="outline"
-                    size="sm"
+                    onClick={handleGenerateScene}
+                    disabled={!language.trim() || isGenerating}
+                    className="w-full relative bg-gradient-to-r from-[#45BB19] to-emerald-600 hover:from-emerald-600 hover:to-green-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-green-500/25 transition-all duration-300 hover:scale-105 border border-green-400/40"
                   >
-                    {isPlaying ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Playing...
-                      </>
-                    ) : (
-                      <>
-                        <Play className="mr-2 h-4 w-4" />
-                        Replay Audio
-                      </>
-                    )}
+                    {/* Glossy overlay effect */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/10 to-transparent rounded-xl"></div>
+                    <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent rounded-t-xl"></div>
+                    
+                    <span className="relative flex items-center justify-center">
+                      {isGenerating ? (
+                        <>
+                          <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                          Generating Scene...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="mr-3 h-5 w-5" />
+                          Generate Practice Scene
+                        </>
+                      )}
+                    </span>
                   </Button>
 
-                  {!isLastLine && (
-                    <Button
-                      onClick={nextLine}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <SkipForward className="mr-2 h-4 w-4" />
-                      Skip
-                    </Button>
+                  {isGenerating && (
+                    <div className="text-center py-4">
+                      <div className="animate-pulse text-green-600 font-semibold">
+                        🎬 Creating your personalized conversation scene...
+                      </div>
+                    </div>
                   )}
-
-                  <Button
-                    onClick={restartScene}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <RotateCcw className="mr-2 h-4 w-4" />
-                    Restart
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Recording Section - Always Visible */}
-          {currentLine && (
-            <Card className="border-2 border-green-200 bg-green-50/30">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Mic className="h-5 w-5 text-green-600" />
-                  Record Your Response
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-muted-foreground">
-                  Practice saying: "{currentLine.text} {currentLine.answer}"
-                </p>
-                
-                <div className="flex items-center gap-4">
-                  <Button
-                    onClick={isRecording ? stopRecording : startRecording}
-                    variant={isRecording ? "destructive" : "default"}
-                    size="lg"
-                    className="flex-1"
-                    disabled={isPlaying}
-                  >
-                    {isRecording ? (
-                      <>
-                        <MicOff className="mr-2 h-5 w-5" />
-                        Stop Recording
-                      </>
-                    ) : (
-                      <>
-                        <Mic className="mr-2 h-5 w-5" />
-                        Start Recording
-                      </>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            // Scene Practice Interface
+            <div className="space-y-6">
+              {/* Scene Header */}
+              <Card className="bg-white/80 backdrop-blur-sm border-green-200/50 shadow-lg">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-2xl font-bold bg-gradient-to-r from-[#45BB19] to-emerald-600 bg-clip-text text-transparent">
+                      🎭 {sceneData.title}
+                    </CardTitle>
+                    <Badge variant="secondary" className="bg-green-100 text-green-700 font-semibold">
+                      {sceneData.language}
+                    </Badge>
+                  </div>
+                  <p className="text-gray-600 mt-2">{sceneData.description}</p>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium text-gray-700">
+                        Line {currentLineIndex + 1} of {sceneData.scriptLines.length}
+                      </span>
+                      <span className="font-bold text-green-600">
+                        {Math.round(progress)}% Complete
+                      </span>
+                    </div>
+                    <Progress 
+                      value={progress} 
+                      className="h-2 bg-green-100"
+                    />
+                    {isLastLine && (
+                      <div className="text-center text-green-600 font-semibold animate-pulse">
+                        🎉 Final line! You're almost done!
+                      </div>
                     )}
-                  </Button>
-                </div>
-
-                {/* Live Transcript Display */}
-                {(interimTranscript || userResponse) && (
-                  <div className="p-4 bg-white border border-green-200 rounded-lg">
-                    <p className="text-sm text-muted-foreground mb-1">
-                      {userResponse ? 'Recorded:' : 'Listening...'}
-                    </p>
-                    <p className="text-lg font-medium">
-                      {userResponse || interimTranscript}
-                    </p>
                   </div>
-                )}
+                </CardContent>
+              </Card>
 
-                {/* Recording Status */}
-                {isRecording && (
-                  <div className="flex items-center gap-2 text-green-600">
-                    <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm font-medium">Recording in progress...</span>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Content Display */}
+                <Card className="bg-white/90 backdrop-blur-sm shadow-lg border border-green-100/40 rounded-2xl overflow-hidden">
+                  <CardHeader className="py-3 border-b border-green-100/30">
+                    <CardTitle className="flex items-center gap-2 text-lg font-bold text-gray-800">
+                      <Volume2 className="h-5 w-5 text-[#45BB19]" />
+                      {currentLine?.speaker} - Line {currentLine?.order}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4 space-y-3">
+                    {/* TTS Section - Compact */}
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Volume2 className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm font-bold text-blue-700">🔊 TTS Says</span>
+                        <Badge className="bg-blue-500 text-white text-xs">Listen</Badge>
+                      </div>
+                      <p className="text-lg font-medium text-gray-800 bg-white/80 p-3 rounded-lg">
+                        "{currentLine?.text}"
+                      </p>
+                    </div>
 
-          {/* Completion */}
-          {isLastLine && !isWaitingForResponse && (
-            <Card className="border-green-200 bg-green-50">
-              <CardContent className="text-center py-8">
-                <h2 className="text-2xl font-bold text-green-800 mb-4">
-                  🎉 Scene Complete!
-                </h2>
-                <p className="text-green-700 mb-6">
-                  Congratulations! You've completed the conversation practice.
-                </p>
-                <div className="flex gap-4 justify-center">
-                  <Button onClick={restartScene} variant="outline">
-                    <RotateCcw className="mr-2 h-4 w-4" />
-                    Practice Again
-                  </Button>
-                  <Button onClick={() => setSceneData(null)}>
-                    Generate New Scene
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                    {/* User Section - Compact */}
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl border border-green-300">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Mic className="h-4 w-4 text-green-600" />
+                        <span className="text-sm font-bold text-green-700">🎤 You Say</span>
+                        <Badge className="bg-green-500 text-white text-xs animate-pulse">Your Turn</Badge>
+                      </div>
+                      <p className="text-lg font-bold text-gray-800 bg-gradient-to-r from-green-100 to-emerald-100 p-3 rounded-lg border border-green-200">
+                        "{currentLine?.answer}"
+                      </p>
+                    </div>
+
+                    {/* User Response Display */}
+                    {(userResponse || interimTranscript) && (
+                      <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-xl border border-yellow-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-sm font-bold text-orange-700">
+                            {userResponse ? '✅ Your Response:' : '👂 Listening...'}
+                          </span>
+                        </div>
+                        <p className="text-base font-semibold text-gray-800 bg-white/80 p-3 rounded-lg">
+                          {userResponse || interimTranscript}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Waiting State */}
+                    {isWaitingForResponse && (
+                      <div className="text-center py-4">
+                        <div className="animate-pulse text-green-600 font-semibold">
+                          🎤 Waiting for your response...
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Recording Section */}
+                <Card className="bg-white/80 backdrop-blur-sm border-green-200/50 shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-bold text-gray-800 flex items-center">
+                      🎙️ Practice & Record
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Audio Control */}
+                    <div className="flex items-center space-x-3">
+                      <Button
+                        onClick={handlePlay}
+                        disabled={isPlaying}
+                        className="relative bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-blue-500/20 transition-all duration-300 hover:scale-105 border border-blue-400/40"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/10 to-transparent rounded-xl"></div>
+                        <span className="relative flex items-center">
+                          {isPlaying ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Play className="mr-2 h-4 w-4" />
+                          )}
+                          {isPlaying ? 'Playing...' : 'Listen'}
+                        </span>
+                      </Button>
+
+                      <Button
+                        onClick={handleRecord}
+                        disabled={false}
+                        className={`relative ${
+                          isRecording 
+                            ? 'bg-gradient-to-r from-red-500 to-red-600' 
+                            : 'bg-gradient-to-r from-[#45BB19] to-emerald-600'
+                        } hover:scale-105 text-white px-6 py-3 rounded-xl font-semibold shadow-lg transition-all duration-300 border border-opacity-40`}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/10 to-transparent rounded-xl"></div>
+                        <span className="relative flex items-center">
+                          {isRecording ? (
+                            <MicOff className="mr-2 h-4 w-4 animate-pulse" />
+                          ) : (
+                            <Mic className="mr-2 h-4 w-4" />
+                          )}
+                          {isRecording ? 'Recording...' : 'Record'}
+                        </span>
+                      </Button>
+                    </div>
+
+                    {/* Recording Status */}
+                    {isRecording && (
+                      <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-center space-x-3">
+                        <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                        <span className="text-sm font-bold">Recording...</span>
+                        <div className="flex space-x-1">
+                          <div className="w-1 h-4 bg-green-400 rounded animate-pulse delay-100"></div>
+                          <div className="w-1 h-6 bg-green-500 rounded animate-pulse delay-200"></div>
+                          <div className="w-1 h-4 bg-green-400 rounded animate-pulse delay-300"></div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Transcript Display */}
+                    {(interimTranscript || userResponse) && (
+                      <div className="bg-white/90 border border-green-200 rounded-xl p-3 shadow-sm">
+                        <p className="text-xs font-medium text-gray-600 mb-2">
+                          {userResponse ? '✅ Recorded:' : '👂 Listening...'}
+                        </p>
+                        <p className="text-base font-semibold text-gray-800 bg-gradient-to-r from-emerald-50 to-green-50 p-2 rounded">
+                          {userResponse || interimTranscript}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="flex space-x-3 pt-3">
+                      <Button
+                        onClick={handleNext}
+                        disabled={false}
+                        className="relative bg-gradient-to-r from-[#45BB19] to-emerald-600 hover:from-emerald-600 hover:to-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-green-500/20 transition-all duration-300 hover:scale-105 border border-green-400/40 flex-1"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/10 to-transparent rounded-xl"></div>
+                        <span className="relative flex items-center justify-center">
+                          <SkipForward className="mr-2 h-4 w-4" />
+                          Next Line
+                        </span>
+                      </Button>
+
+                      <Button
+                        onClick={resetScene}
+                        variant="outline"
+                        className="relative bg-white/90 text-gray-700 border-gray-300 hover:bg-gray-50 px-4 py-3 rounded-xl font-semibold shadow transition-all duration-300 hover:scale-105"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/20 to-transparent rounded-xl"></div>
+                        <span className="relative flex items-center">
+                          <RotateCcw className="mr-2 h-4 w-4" />
+                          Reset
+                        </span>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Scene Completion */}
+              {isLastLine && userResponse && (
+                <Card className="bg-gradient-to-br from-green-50 to-emerald-100 border-green-300 shadow-xl animate-in fade-in duration-500">
+                  <CardContent className="p-8 text-center">
+                    <div className="space-y-6">
+                      {/* Success Animation */}
+                      <div className="relative">
+                        <div className="text-6xl animate-bounce">🎉</div>
+                        <div className="absolute -top-2 -right-2 text-2xl animate-pulse">
+                          <Sparkles className="h-6 w-6 text-yellow-500" />
+                        </div>
+                        <div className="absolute -top-2 -left-2 text-2xl animate-pulse delay-150">
+                          <Star className="h-6 w-6 text-yellow-400" />
+                        </div>
+                      </div>
+
+                      {/* Success Message */}
+                      <div className="space-y-3">
+                        <h2 className="text-3xl font-bold bg-gradient-to-r from-[#45BB19] via-emerald-500 to-green-600 bg-clip-text text-transparent">
+                          Congratulations!
+                        </h2>
+                        <p className="text-lg text-gray-700 font-semibold">
+                          You've completed "{sceneData.title}"
+                        </p>
+                        <div className="flex items-center justify-center space-x-2 text-red-500">
+                          <Heart className="h-5 w-5 animate-pulse" />
+                          <span className="font-medium">Great job practicing!</span>
+                          <Heart className="h-5 w-5 animate-pulse delay-75" />
+                        </div>
+                      </div>
+
+                      {/* Stats */}
+                      <div className="bg-white/80 rounded-xl p-4 border border-green-200">
+                        <div className="flex items-center justify-center space-x-6">
+                          <div className="text-center">
+                            <Trophy className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
+                            <p className="text-sm font-bold text-gray-700">Scene Complete</p>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-[#45BB19] mb-1">100%</div>
+                            <p className="text-sm font-bold text-gray-700">Progress</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action Button */}
+                      <Button
+                        onClick={resetScene}
+                        className="relative bg-gradient-to-r from-[#45BB19] to-emerald-600 hover:from-emerald-600 hover:to-green-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-green-500/25 transition-all duration-300 hover:scale-105 border border-green-400/40"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/10 to-transparent rounded-xl"></div>
+                        <span className="relative flex items-center">
+                          <RotateCcw className="mr-3 h-5 w-5" />
+                          Practice Again
+                        </span>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           )}
         </div>
-      )}
+      </div>
     </div>
   )
 }

@@ -1,31 +1,23 @@
-// Extend the Window interface to include speech recognition
-declare global {
-  interface Window {
-    SpeechRecognition: any
-    webkitSpeechRecognition: any
-  }
-}
-
 class SpeechRecognitionService {
   private recognition: any = null
-  private supported: boolean
+  public supported: boolean = false
 
   constructor() {
-    this.supported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window
+    // Check for browser support
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     
-    if (this.supported) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (SpeechRecognition) {
       this.recognition = new SpeechRecognition()
-      this.setupRecognition()
+      this.supported = true
+      
+      // Configure recognition
+      this.recognition.continuous = true
+      this.recognition.interimResults = true
+      this.recognition.maxAlternatives = 1
+    } else {
+      console.warn('Speech recognition not supported in this browser')
+      this.supported = false
     }
-  }
-
-  private setupRecognition() {
-    if (!this.recognition) return
-
-    this.recognition.continuous = false
-    this.recognition.interimResults = true
-    this.recognition.maxAlternatives = 1
   }
 
   startRecording(
@@ -80,13 +72,15 @@ class SpeechRecognitionService {
   private getErrorMessage(error: string): string {
     switch (error) {
       case 'no-speech':
-        return 'No speech detected'
+        return 'No speech was detected. Please try again.'
       case 'audio-capture':
-        return 'Audio capture failed'
+        return 'Audio capture failed. Please check your microphone.'
       case 'not-allowed':
-        return 'Microphone permission denied'
+        return 'Microphone access denied. Please allow microphone access.'
       case 'network':
-        return 'Network error'
+        return 'Network error occurred. Please check your connection.'
+      case 'aborted':
+        return 'Speech recognition was aborted.'
       default:
         return `Speech recognition error: ${error}`
     }
@@ -95,24 +89,8 @@ class SpeechRecognitionService {
   isSupported(): boolean {
     return this.supported
   }
-
-  // Get supported languages
-  getSupportedLanguages(): Array<{ code: string; name: string }> {
-    return [
-      { code: 'en-US', name: 'English (US)' },
-      { code: 'en-GB', name: 'English (UK)' },
-      { code: 'es-ES', name: 'Spanish (Spain)' },
-      { code: 'es-MX', name: 'Spanish (Mexico)' },
-      { code: 'fr-FR', name: 'French (France)' },
-      { code: 'de-DE', name: 'German (Germany)' },
-      { code: 'it-IT', name: 'Italian (Italy)' },
-      { code: 'pt-BR', name: 'Portuguese (Brazil)' },
-      { code: 'ru-RU', name: 'Russian (Russia)' },
-      { code: 'ja-JP', name: 'Japanese (Japan)' },
-      { code: 'ko-KR', name: 'Korean (South Korea)' },
-      { code: 'zh-CN', name: 'Chinese (Mandarin)' },
-    ]
-  }
 }
 
+// Create and export a singleton instance
 export const speechRecognitionService = new SpeechRecognitionService()
+export default speechRecognitionService

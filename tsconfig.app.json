@@ -29,5 +29,7 @@
     "noFallthroughCasesInSwitch": true,
     // Removed unsupported options for TS 5.3.x
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }
