@@ -7,10 +7,11 @@
   "exclude": ["src/electron"],
   "compilerOptions": {
     "baseUrl": ".",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "paths": {
       "@/*": ["./src/ui/*"]
     },
-    "noUnusedParameters": false,
     // Removed unsupported option for TS 5.3.x
   }
 }

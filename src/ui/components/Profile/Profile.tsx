@@ -1,4 +1,3 @@
-import React from 'react';
 import { useUser } from '@/ui/lib/contextStores/userStore';
 import LogoutButton from '../Buttons/LogoutButton';
 const Profile = () => {
