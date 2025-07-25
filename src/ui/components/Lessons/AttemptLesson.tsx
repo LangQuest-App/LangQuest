@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Volume2 } from 'lucide-react';
 import LessonCompletion from './LessonCompletion';
 import MultilingualKeyboard from '../KeyBoard';
+import { useUser } from '@/ui/lib/contextStores/userStore';
 
 const AttemptLesson = ({ lesson }: any) => {
   const [current, setCurrent] = useState(0);
@@ -11,9 +12,9 @@ const AttemptLesson = ({ lesson }: any) => {
   const [score, setScore] = useState(0);
   const questions = lesson?.questions || [];
   const inputRef = useRef<HTMLInputElement>(null);
-  
-  console.log(lesson)
-  
+  const {userData} = useUser();
+  // console.log("User Data in AttemptLesson:", userData?.preferences?.native_lang);
+
     const handleVirtualKeyPress = (key: string) => {
       const input = inputRef.current;
       if (!input) return;
@@ -115,7 +116,7 @@ const AttemptLesson = ({ lesson }: any) => {
                 Check
               </button>
             )}
-            <MultilingualKeyboard onKeyPress={handleVirtualKeyPress} />
+            <MultilingualKeyboard language={userData?.preferences?.native_lang.toLowerCase()|| "english"} onKeyPress={handleVirtualKeyPress} />
             {locked[current] && (
               <div className={`mt-2 text-lg font-bold ${answers[current]?.trim().toLowerCase() === q.correct_answer?.trim().toLowerCase() ? 'text-green-600' : 'text-red-600'}`}>
                 {answers[current]?.trim().toLowerCase() === q.correct_answer?.trim().toLowerCase() ? 'Correct!' : `Wrong! Correct answer: ${q.correct_answer}`}
