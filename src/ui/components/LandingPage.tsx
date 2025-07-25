@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ArrowRight } from "lucide-react";
-import Logo from "/images/Logo.png"; // Ensure this path is correct for your project structure
+// import Logo from "/images/Logo.png"; // Temporarily commented out
 import { Link } from "react-router-dom";
 // import { useUser } from "../lib/contextStores/userStore";
 
@@ -27,7 +27,7 @@ const LandingPage = () => {
         >
           <div className="relative group mb-12">
             <img
-              src={Logo || "/placeholder.svg"}
+              src="/images/Logo.png"
               alt="LangQuest Logo"
               className="relative w-48 h-48 mx-auto rounded-full border-4 border-white/90 group-hover:scale-105 transition-transform duration-300"
               style={{
@@ -47,9 +47,9 @@ const LandingPage = () => {
             Welcome to LangQuest
           </h1>
         </div>
-        {/* CTA Button */}
+        {/* CTA Buttons */}
         <div
-          className={`transform transition-all duration-1000 delay-600 ${
+          className={`transform transition-all duration-1000 delay-600 flex flex-col sm:flex-row gap-4 items-center ${
             isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
           }`}
         >
@@ -66,6 +66,23 @@ const LandingPage = () => {
             <div className="absolute inset-0 rounded-2xl shadow-inner shadow-black/10"></div>
             <span className="relative flex items-center justify-center">
               Start Your Journey
+              <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" />
+            </span>
+          </Link>
+          
+          <Link
+            to={"/scene"}
+            className="group relative inline-block px-12 py-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold text-xl rounded-2xl shadow-2xl hover:shadow-blue-400/40 transition-all duration-300 hover:scale-105 overflow-hidden tracking-wider font-fredoka"
+          >
+            {/* Enhanced Glossy overlay effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-white/30 to-white/5 rounded-2xl"></div>
+            <div className="absolute top-0 left-0 w-3/4 h-1/2 bg-gradient-to-br from-white/50 to-transparent rounded-tl-2xl"></div>
+            {/* Hover effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300 rounded-2xl"></div>
+            {/* Inner shadow for depth */}
+            <div className="absolute inset-0 rounded-2xl shadow-inner shadow-black/10"></div>
+            <span className="relative flex items-center justify-center">
+              Practice Scene
               <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" />
             </span>
           </Link>
