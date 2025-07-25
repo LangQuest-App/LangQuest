@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Volume2 } from 'lucide-react';
 import LessonCompletion from './LessonCompletion';
+import MultilingualKeyboard from '../KeyBoard';
+import { useUser } from '@/ui/lib/contextStores/userStore';
 
 const AttemptLesson = ({ lesson }: any) => {
   const [current, setCurrent] = useState(0);
@@ -9,6 +11,21 @@ const AttemptLesson = ({ lesson }: any) => {
   const [wrongQuestions, setWrongQuestions] = useState<any[]>([]);
   const [score, setScore] = useState(0);
   const questions = lesson?.questions || [];
+  const inputRef = useRef<HTMLInputElement>(null);
+  const {userData} = useUser();
+  // console.log("User Data in AttemptLesson:", userData?.preferences?.native_lang);
+
+    const handleVirtualKeyPress = (key: string) => {
+      const input = inputRef.current;
+      if (!input) return;
+      if (key === "{bksp}") {
+        input.value = input.value.slice(0, -1);
+      } else if (key === "{space}") {
+        input.value += " ";
+      } else if (key.length === 1 || /^[^\{\}]+$/.test(key)) {
+        input.value += key;
+      }
+    };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, idx: number) => {
     if (!locked[idx]) {
@@ -83,6 +100,7 @@ const AttemptLesson = ({ lesson }: any) => {
         {q?.answer_type === 'text_input' && (
           <div className="w-full flex flex-col gap-4">
             <input
+              ref={inputRef}
               type="text"
               className="w-full border border-green-200 rounded-lg px-4 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               value={answers[current] || ''}
@@ -92,12 +110,13 @@ const AttemptLesson = ({ lesson }: any) => {
             />
             {!locked[current] && (
               <button
-                onClick={() => checkAnswer(current)}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-green-700 transition"
+              onClick={() => checkAnswer(current)}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-green-700 transition"
               >
                 Check
               </button>
             )}
+            <MultilingualKeyboard language={userData?.preferences?.native_lang.toLowerCase()|| "english"} onKeyPress={handleVirtualKeyPress} />
             {locked[current] && (
               <div className={`mt-2 text-lg font-bold ${answers[current]?.trim().toLowerCase() === q.correct_answer?.trim().toLowerCase() ? 'text-green-600' : 'text-red-600'}`}>
                 {answers[current]?.trim().toLowerCase() === q.correct_answer?.trim().toLowerCase() ? 'Correct!' : `Wrong! Correct answer: ${q.correct_answer}`}

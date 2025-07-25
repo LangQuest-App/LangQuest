@@ -1,14 +1,12 @@
 import { ArrowRight, Play, Star, Zap } from "lucide-react";
 import FrogBook from  "/images/frog-book.png"
 import { Link } from "react-router-dom";
-import BackToHome from "./Buttons/BackToHome";
 import LogoutButton from "./Buttons/LogoutButton";
 
 const Hero = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 overflow-hidden relative">
       {/* Enhanced Floating Background Elements */}
-
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Wider gradient orbs */}
         <div className="absolute -top-60 -right-60 w-[800px] h-[800px] bg-gradient-to-br from-green-400/30 to-emerald-500/20 rounded-full blur-3xl animate-pulse"></div>
@@ -20,7 +18,6 @@ const Hero = () => {
         <div className="absolute top-3/4 right-1/3 w-3 h-3 bg-emerald-300/50 rounded-full animate-bounce delay-700"></div>
         <div className="absolute top-1/2 left-3/4 w-1.5 h-1.5 bg-teal-400/60 rounded-full animate-bounce delay-1100"></div>
       </div>
-
      {/* <BackToHome/> */}
 
      <LogoutButton/>
