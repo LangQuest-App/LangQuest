@@ -18,7 +18,7 @@ const Navbar = () => {
   const navItems = [
     { name: 'Lessons', href: '/lessons', icon: BookOpen },
     { name: 'Quiz', href: '/quiz', icon: Brain },
-    { name: 'Practice', href: '/practice', icon: Target },
+    { name: 'Practice', href: '/scene', icon: Target },
     { name: 'Profile', href: '/profile', icon: User },
   ];
 
