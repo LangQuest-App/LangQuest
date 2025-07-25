@@ -44,6 +44,23 @@ ipcMain.handle(
   }
 );
 
+ipcMain.handle('fetch-data', async (event, { url, data, method }) => {
+  try {
+    console.log("URL:", url)
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: method !== 'GET' ? JSON.stringify(data) : undefined,
+    });
+    const result = await res.json();
+    return result;
+  } catch (err:any) {
+    console.error('API call failed:', err);
+    return { error: true, message: err.message };
+  }
+});
+
+
  ipcMain.handle("open-external", async (_event, url: string) => {
   try {
     await shell.openExternal(url);
