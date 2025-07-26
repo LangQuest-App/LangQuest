@@ -72,7 +72,7 @@ const Scene: React.FC = () => {
     setIsGenerating(true)
     try {
       // POST request to generate scene
-      const response = await fetch('http://localhost:8000/scene', {
+      const response = await fetch('https://langquest-backend.onrender.com/scene', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ const Scene: React.FC = () => {
   // Fetch scene data and start practice
   const fetchAndStartPractice = async () => {
     try {
-      const response = await fetch('http://localhost:8000/scene', {
+      const response = await fetch('https://langquest-backend.onrender.com/scene', {
         method: 'GET',
       })
 
