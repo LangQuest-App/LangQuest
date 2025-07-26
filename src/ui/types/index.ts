@@ -93,13 +93,6 @@ export interface APIResponse<T> {
   message?: string
 }
 
-// Speech Recognition types
-export interface SpeechRecognitionResult {
-  transcript: string
-  confidence: number
-  isFinal: boolean
-}
-
 // MURF AI types
 export interface MURFOptions {
   text: string

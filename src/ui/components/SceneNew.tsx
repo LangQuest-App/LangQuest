@@ -18,11 +18,12 @@ import {
   Sparkles,
   Heart,
   Star,
-  CheckCircle
+  CheckCircle,
+  Brain
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Link } from 'react-router-dom'
-import { speechRecognitionService } from '../utils/speechRecognitionService'
+import FeedbackPage from './FeedbackPage'
 
 // Types matching the backend API response
 interface ScriptLine {
@@ -52,9 +53,10 @@ const Scene: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [userResponse, setUserResponse] = useState('')
-  const [interimTranscript, setInterimTranscript] = useState('')
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false)
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null)
+  const [showFeedback, setShowFeedback] = useState(false)
+  const [sceneCompleted, setSceneCompleted] = useState(false)
 
   const currentLine = sceneData?.scriptLines[currentLineIndex]
   const progress = sceneData ? ((currentLineIndex + 1) / sceneData.scriptLines.length) * 100 : 0
@@ -115,8 +117,8 @@ const Scene: React.FC = () => {
       setSceneData(data)
       setCurrentLineIndex(0)
       setUserResponse('')
-      setInterimTranscript('')
       setIsWaitingForResponse(false)
+      setSceneCompleted(false)
 
     } catch (error) {
       console.error('Error fetching scene:', error)
@@ -162,51 +164,18 @@ const Scene: React.FC = () => {
     }
   }, [currentLine?.voiceUrl, currentAudio, isPlaying])
 
-  // Handle recording
-  const handleRecord = useCallback(async () => {
+  // Handle recording (dummy function)
+  const handleRecord = useCallback(() => {
     if (isRecording) {
       // Stop recording
-      try {
-        speechRecognitionService.stopRecording()
-        setIsRecording(false)
-      } catch (error) {
-        console.error('Error stopping recording:', error)
-        toast.error('Failed to stop recording')
-      }
+      setIsRecording(false)
+      toast.info('Recording stopped')
     } else {
       // Start recording
-      try {
-        setIsRecording(true)
-        setInterimTranscript('')
-        setUserResponse('')
-        setIsWaitingForResponse(false)
-
-        speechRecognitionService.startRecording(
-          'en-US',
-          (transcript: string, isFinal: boolean) => {
-            if (isFinal) {
-              setUserResponse(transcript)
-              setInterimTranscript('')
-              setIsRecording(false)
-              setIsWaitingForResponse(false)
-              toast.success('Response recorded successfully!')
-            } else {
-              setInterimTranscript(transcript)
-            }
-          },
-          (error: string) => {
-            console.error('Speech recognition error:', error)
-            setIsRecording(false)
-            setInterimTranscript('')
-            setIsWaitingForResponse(false)
-            toast.error('Speech recognition failed. Please try again.')
-          }
-        )
-      } catch (error) {
-        console.error('Error starting recording:', error)
-        setIsRecording(false)
-        toast.error('Failed to start recording')
-      }
+      setIsRecording(true)
+      setUserResponse('')
+      setIsWaitingForResponse(false)
+      toast.info('Recording started')
     }
   }, [isRecording])
 
@@ -217,10 +186,11 @@ const Scene: React.FC = () => {
     if (currentLineIndex < sceneData.scriptLines.length - 1) {
       setCurrentLineIndex(prev => prev + 1)
       setUserResponse('')
-      setInterimTranscript('')
       setIsWaitingForResponse(false)
       toast.success('Moving to next line!')
     } else {
+      // Scene completed
+      setSceneCompleted(true)
       toast.success('Scene completed! Great job!')
     }
   }, [sceneData, currentLineIndex])
@@ -229,8 +199,8 @@ const Scene: React.FC = () => {
   const resetScene = useCallback(() => {
     setCurrentLineIndex(0)
     setUserResponse('')
-    setInterimTranscript('')
     setIsWaitingForResponse(false)
+    setSceneCompleted(false)
     if (currentAudio) {
       currentAudio.pause()
       currentAudio.currentTime = 0
@@ -241,6 +211,15 @@ const Scene: React.FC = () => {
     toast.info('Scene reset to beginning')
   }, [currentAudio])
 
+  // Handle feedback
+  const handleGetFeedback = useCallback(() => {
+    setShowFeedback(true)
+  }, [])
+
+  const handleBackFromFeedback = useCallback(() => {
+    setShowFeedback(false)
+  }, [])
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -249,11 +228,19 @@ const Scene: React.FC = () => {
         currentAudio.onended = null
         currentAudio.onerror = null
       }
-      if (isRecording) {
-        speechRecognitionService.stopRecording()
-      }
     }
-  }, [currentAudio, isRecording])
+  }, [currentAudio])
+
+  // Show feedback page if requested
+  if (showFeedback && sceneData) {
+    return (
+      <FeedbackPage
+        sceneTitle={sceneData.title}
+        language={sceneData.language}
+        onBack={handleBackFromFeedback}
+      />
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
@@ -285,7 +272,7 @@ const Scene: React.FC = () => {
         </div>
       </div>
 
-      <div className="relative z-10 px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 px-4 sm:px-6 lg:px-8 pb-24">
         <div className="max-w-6xl mx-auto">
           {!sceneData ? (
             // Language Input Section
@@ -423,15 +410,15 @@ const Scene: React.FC = () => {
                     </div>
 
                     {/* User Response Display */}
-                    {(userResponse || interimTranscript) && (
+                    {userResponse && (
                       <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-xl border border-yellow-200">
                         <div className="flex items-center gap-2 mb-2">
                           <span className="text-sm font-bold text-orange-700">
-                            {userResponse ? '✅ Your Response:' : '👂 Listening...'}
+                            ✅ Your Response:
                           </span>
                         </div>
                         <p className="text-base font-semibold text-gray-800 bg-white/80 p-3 rounded-lg">
-                          {userResponse || interimTranscript}
+                          {userResponse}
                         </p>
                       </div>
                     )}
@@ -489,7 +476,7 @@ const Scene: React.FC = () => {
                           ) : (
                             <Mic className="mr-2 h-4 w-4" />
                           )}
-                          {isRecording ? 'Recording...' : 'Record'}
+                          {isRecording ? 'Stop Recording' : 'Start Recording'}
                         </span>
                       </Button>
                     </div>
@@ -498,7 +485,7 @@ const Scene: React.FC = () => {
                     {isRecording && (
                       <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-center space-x-3">
                         <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                        <span className="text-sm font-bold">Recording...</span>
+                        <span className="text-sm font-bold">Recording... </span>
                         <div className="flex space-x-1">
                           <div className="w-1 h-4 bg-green-400 rounded animate-pulse delay-100"></div>
                           <div className="w-1 h-6 bg-green-500 rounded animate-pulse delay-200"></div>
@@ -508,13 +495,13 @@ const Scene: React.FC = () => {
                     )}
 
                     {/* Transcript Display */}
-                    {(interimTranscript || userResponse) && (
+                    {userResponse && (
                       <div className="bg-white/90 border border-green-200 rounded-xl p-3 shadow-sm">
                         <p className="text-xs font-medium text-gray-600 mb-2">
-                          {userResponse ? '✅ Recorded:' : '👂 Listening...'}
+                          ✅ Recorded:
                         </p>
                         <p className="text-base font-semibold text-gray-800 bg-gradient-to-r from-emerald-50 to-green-50 p-2 rounded">
-                          {userResponse || interimTranscript}
+                          {userResponse}
                         </p>
                       </div>
                     )}
@@ -550,8 +537,8 @@ const Scene: React.FC = () => {
               </div>
 
               {/* Scene Completion */}
-              {isLastLine && userResponse && (
-                <Card className="bg-gradient-to-br from-green-50 to-emerald-100 border-green-300 shadow-xl animate-in fade-in duration-500">
+              {sceneCompleted && (
+                <Card className="bg-gradient-to-br from-green-50 to-emerald-100 border-green-300 shadow-xl animate-in fade-in duration-500 mb-24">
                   <CardContent className="p-8 text-center">
                     <div className="space-y-6">
                       {/* Success Animation */}
@@ -594,17 +581,30 @@ const Scene: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Action Button */}
-                      <Button
-                        onClick={resetScene}
-                        className="relative bg-gradient-to-r from-[#45BB19] to-emerald-600 hover:from-emerald-600 hover:to-green-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-green-500/25 transition-all duration-300 hover:scale-105 border border-green-400/40"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/10 to-transparent rounded-xl"></div>
-                        <span className="relative flex items-center">
-                          <RotateCcw className="mr-3 h-5 w-5" />
-                          Practice Again
-                        </span>
-                      </Button>
+                      {/* Action Buttons */}
+                      <div className="flex space-x-4">
+                        <Button
+                          onClick={handleGetFeedback}
+                          className="relative bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105 border border-blue-400/40 flex-1"
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/10 to-transparent rounded-xl"></div>
+                          <span className="relative flex items-center justify-center">
+                            <Brain className="mr-3 h-5 w-5" />
+                            Get AI Feedback
+                          </span>
+                        </Button>
+
+                        <Button
+                          onClick={resetScene}
+                          className="relative bg-gradient-to-r from-[#45BB19] to-emerald-600 hover:from-emerald-600 hover:to-green-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-green-500/25 transition-all duration-300 hover:scale-105 border border-green-400/40 flex-1"
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/10 to-transparent rounded-xl"></div>
+                          <span className="relative flex items-center justify-center">
+                            <RotateCcw className="mr-3 h-5 w-5" />
+                            Practice Again
+                          </span>
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
