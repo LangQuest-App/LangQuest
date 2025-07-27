@@ -213,6 +213,7 @@ app.on("ready", () => {
 
   if (process.env.NODE_ENV === "development") {
     mainWindow.loadURL("http://localhost:5123");
+    mainWindow.webContents.openDevTools();
   } else {
     console.log(process.env.NODE_ENV);
     mainWindow.loadFile(path.join(app.getAppPath(), "dist-react", "index.html"));
@@ -226,5 +227,5 @@ app.on("ready", () => {
     });
   }
 
-  mainWindow.webContents.openDevTools();
+  
 });
