@@ -36,7 +36,7 @@ const Onborading = () => {
     if (stage < questions.length - 1) {
       setStage(stage + 1);
     } else {
-      console.log("Preferences saved:", preferences);
+      // console.log("Preferences saved:", preferences);
     }
   };
 
@@ -65,8 +65,8 @@ const generateLessons = async (preferences:any) => {
       if( response.status !== 200) {
         throw new Error("Failed to fetch lessons");
       }
-      console.log("Lessons fetched successfully:", response.data);
-      console.log(response.data);
+      // console.log("Lessons fetched successfully:", response.data);
+      // console.log(response.data);
     } catch (error) {
       console.error('Error fetching lesson:', error);
     }
@@ -99,7 +99,7 @@ const generateLessons = async (preferences:any) => {
                 value={preferences[Object.keys(preferences)[stage] as keyof IUserPreference] || ""}
                 onChange={(e) => {
                   handleInputChange(e.target.value);
-                  console.log("selected", e.target.value);
+                  // console.log("selected", e.target.value);
                 }}
                 className="border-2 border-green-400 rounded-xl p-4 text-2xl md:text-3xl font-semibold text-emerald-700 bg-green-50 focus:border-green-500 focus:ring-0 focus:outline-none transition-all duration-300 mb-6 w-full max-w-xl mx-auto"
               >
@@ -125,7 +125,7 @@ const generateLessons = async (preferences:any) => {
                     <input
                       onChange={() => {
                         handleInputChange(option);
-                        console.log("selected", option);
+                        // console.log("selected", option);
                       }}
                       checked={preferences[Object.keys(preferences)[stage] as keyof IUserPreference] === option}
                       type="radio"

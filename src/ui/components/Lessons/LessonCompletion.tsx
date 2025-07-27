@@ -28,7 +28,7 @@ const LessonCompletion = ({ score, total, lesson_id, wrongQuestions }: LessonCom
           { questions: wrongQuestions, lesson_id },
           "POST"
         );
-        console.log("Response from update:", response);
+        // console.log("Response from update:", response);
         if (response.status !== 200) {
           setError(response.message || "Failed to update mistakes");
         }

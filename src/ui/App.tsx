@@ -24,7 +24,7 @@ const AppContent = () => {
     const initializeUser = async () => {
       try {
         await setUserData();
-        console.log('User data initialized on app mount', userData);
+        // console.log('User data initialized on app mount', userData);
       } catch (error) {
         console.error('Error initializing user data:', error);
       }

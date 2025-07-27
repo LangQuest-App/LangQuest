@@ -37,7 +37,7 @@ const MultilingualKeyboard = ({ onKeyPress,language }:MultilingualKeyboardProps)
   }, [language]);
 
   const handleKeyPress = (button:any) => {
-    console.log("Button pressed", button);
+    // console.log("Button pressed", button);
     
     if (button === "{shift}" || button === "{lock}") {
       handleShift();

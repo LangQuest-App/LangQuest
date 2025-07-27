@@ -20,7 +20,7 @@ const MistakesViewer: React.FC<MistakesProps> = ({ lessonId, lesson }) => {
     const fetchMistakes = async () => {
       setLoading(true);
       setError(null);
-      console.log("Fetching mistakes for lesson:", `${BACKEND_URL}/lesson/${lessonId}/get-mistakes`);
+      // console.log("Fetching mistakes for lesson:", `${BACKEND_URL}/lesson/${lessonId}/get-mistakes`);
       try {
         const response = await window.electronAPI.fetchData(
           `${BACKEND_URL}/lesson/${lessonId}/get-mistake`,
@@ -32,7 +32,7 @@ const MistakesViewer: React.FC<MistakesProps> = ({ lessonId, lesson }) => {
           setMistakes([]);
         } else {
           setMistakes(response.data);
-          console.log("Fetched mistakes:", response.data);
+          // console.log("Fetched mistakes:", response.data);
         }
       } catch (err: any) {
         setError(err?.message || 'Internal server error');

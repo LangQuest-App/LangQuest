@@ -44,7 +44,7 @@ const SignIn = ({toggleState}:SignInProps) => {
     setIsLoading(true)
     
     try {
-      console.log("Sign in form submitted:", formData)
+      // console.log("Sign in form submitted:", formData)
       await new Promise(resolve => setTimeout(resolve, 1000))
       await saveUserDataToStore(formData)
 
@@ -64,10 +64,10 @@ const SignIn = ({toggleState}:SignInProps) => {
       await store.set('username', formData.email)
       await store.set('lastSignInTime', new Date().toISOString())
       await store.set('isLoggedIn', true)
-      console.log('User data saved to store:', {
-        email: formData.email,
-        username: formData.username
-      })
+      // console.log('User data saved to store:', {
+      //   email: formData.email,
+      //   username: formData.username
+      // })
       
     } catch (error) {
       console.error('Error saving user data to store:', error)

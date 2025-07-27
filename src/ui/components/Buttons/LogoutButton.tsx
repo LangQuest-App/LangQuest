@@ -2,7 +2,7 @@ import store from "../../utils/electron-store";
 import { LogOut } from "lucide-react";
 const LogoutButton = () => {
   const deleteUserData = async () => {
-    console.log("Deleting user data from store...");
+    // console.log("Deleting user data from store...");
     try {
       await store.delete("lastSignedInEmail");
       await store.delete("username");
