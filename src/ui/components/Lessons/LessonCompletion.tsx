@@ -22,13 +22,13 @@ const LessonCompletion = ({ score, total, lesson_id, wrongQuestions }: LessonCom
       setUpdating(true);
       setError(null);
       try {
-        const BACKEND_URL = import.meta.env.VITE_BACKEND_URL!;
+        const BACKEND_URL = "https://langquest-backend.onrender.com";
         const response = await window.electronAPI.fetchData(
           `${BACKEND_URL}/lesson/update`,
           { questions: wrongQuestions, lesson_id },
           "POST"
         );
-        console.log("Response from update:", response);
+        // console.log("Response from update:", response);
         if (response.status !== 200) {
           setError(response.message || "Failed to update mistakes");
         }

@@ -24,6 +24,7 @@ import {
 import { toast } from 'sonner'
 import { Link } from 'react-router-dom'
 import FeedbackPage from './FeedbackPage'
+import BackToHome from './Buttons/BackToHome'
 
 // Types matching the backend API response
 interface ScriptLine {
@@ -251,18 +252,7 @@ const Scene: React.FC = () => {
       {/* Navigation Header */}
       <div className="relative z-10 p-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link to="/home" className="group">
-            <button className="group relative bg-white/90 backdrop-blur-sm text-[#45BB19] px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-green-500/20 transition-all duration-300 hover:scale-105 border border-green-100/40">
-              {/* Glossy overlay effect */}
-              <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/20 to-transparent rounded-xl"></div>
-              <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-t-xl"></div>
-              
-              <span className="relative flex items-center">
-                <Home className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
-                Back to Home
-              </span>
-            </button>
-          </Link>
+              <BackToHome/>
           
           <h1 className="text-3xl font-bold bg-gradient-to-r from-[#45BB19] via-emerald-500 to-green-600 bg-clip-text text-transparent">
             🐸 Practice Scene

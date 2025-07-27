@@ -10,7 +10,7 @@ const Lesson = () => {
 
   useEffect(() => {
     setTimeout(() => {
-       console.log(userData);
+      //  console.log(userData);
     if (userData && !userData.preferences) {
       setShowOnboarding(true);
     }

@@ -62,7 +62,7 @@ export const useUser = create<userStateType & UserStoreActions>((set, get) => ({
     set({ userLoading: true });
     const { userData } = get();
     if (userData) {
-      console.log(data)
+      // console.log(data)
       userData.preferences = data;
       set({ userData });
     } else {

@@ -1,11 +1,13 @@
 import type { Lesson } from '@/ui/lib/types/lesson';
 import React, { useEffect } from 'react';
 import AttemptLesson from './AttemptLesson';
+import MistakesViewer from './MistakesViewer';
 
 const LessonList = () => {
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL!;
+  const BACKEND_URL = "https://langquest-backend.onrender.com";
   const [lessons, setLessons] = React.useState<Lesson[]>([]);
   const [attempting, setAttempting] = React.useState<number | null>(null);
+  const [viewMistakesIdx, setViewMistakesIdx] = React.useState<number | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -36,6 +38,9 @@ const LessonList = () => {
     fetchLesson();
   }, []);
 
+  if (viewMistakesIdx !== null && lessons[viewMistakesIdx]) {
+    return <MistakesViewer lessonId={lessons[viewMistakesIdx].id} lesson={lessons[viewMistakesIdx]} />;
+  }
   if (attempting !== null) {
     return <AttemptLesson lesson={lessons[attempting]} />;
   }
@@ -68,12 +73,23 @@ const LessonList = () => {
                   <h3 className="text-2xl font-family-fredoka font-extrabold text-zinc-700 mb-2">{lesson.title}</h3>
                   <p className="text-base font-family-fredoka text-gray-600">{lesson.questions.length} Questions</p>
                 </div>
-                <button
-                  className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-family-fredoka tracking-wider transition font-medium shadow-md"
-                  onClick={() => setAttempting(index)}
-                >
-                  {lesson.attempted ? 'Reattempt' : 'Attempt Lesson'}
-                </button>
+                <div className="flex gap-4">
+                  <button
+                    className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-family-fredoka tracking-wider transition font-medium shadow-md"
+                    onClick={() => setAttempting(index)}
+                  >
+                    {lesson.attempted ? 'Reattempt' : 'Attempt Lesson'}
+                  </button>
+                  {lesson.attempted && (
+                    <button
+                      className="bg-yellow-400 text-zinc-900 px-6 py-2 rounded-lg hover:bg-yellow-500 font-family-fredoka tracking-wider transition font-medium shadow-md border-2 border-yellow-600"
+                      onClick={() => setViewMistakesIdx(index)}
+                      title="View Mistakes"
+                    >
+                      View Mistakes
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))

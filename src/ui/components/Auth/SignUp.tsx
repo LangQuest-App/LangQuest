@@ -34,7 +34,7 @@ const SignUp = ({toggleState}:SignUpProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Form submitted:", formData)
+    // console.log("Form submitted:", formData)
     // AXIOS
   }
 

@@ -53,6 +53,7 @@
     "motion": "^12.23.6",
     "motion-react": "^0.15.0-alpha.1",
     "react": "^19.1.0",
+    "react-activity-calendar": "^2.7.13",
     "react-day-picker": "^9.8.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.60.0",
