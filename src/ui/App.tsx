@@ -1,4 +1,4 @@
-import { Toaster as Sonner } from "./components/ui/sonner";
+import { Toaster } from 'sonner';
 import { TooltipProvider } from "./components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HashRouter, Routes, Route } from "react-router-dom";
@@ -41,7 +41,7 @@ const AppContent = () => {
       userData?.isLoggedIn &&
       <Navbar/>
     }
-      <Sonner />
+      <Toaster />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/home" element={<Hero />} />

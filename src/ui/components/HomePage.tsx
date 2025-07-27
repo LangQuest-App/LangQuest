@@ -21,7 +21,7 @@ const Hero = () => {
      {/* <BackToHome/> */}
 
      <LogoutButton/>
-      <section className="min-h-screen flex items-center justify-center pt-16 relative z-10">
+      <section className="min-h-screen flex items-center justify-center relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left Content */}

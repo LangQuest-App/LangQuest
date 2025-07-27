@@ -15,10 +15,10 @@ const MultilingualKeyboard = ({ onKeyPress,language }:MultilingualKeyboardProps)
   const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
-    const layoutsInstance = new KeyboardLayouts();
-    const languages = Object.keys(layoutsInstance.layouts);
+    // const layoutsInstance = new KeyboardLayouts();
+    // const languages = Object.keys(layoutsInstance.layouts);
     
-    console.log("Available languages:", languages);
+    // console.log("Available languages:", languages);
     
   }, []);
 
@@ -28,7 +28,7 @@ const MultilingualKeyboard = ({ onKeyPress,language }:MultilingualKeyboardProps)
         const layoutsInstance = new KeyboardLayouts();
         const layout = layoutsInstance.get(language);
         
-        console.log(`Layout for ${language}:`, layout);
+        // console.log(`Layout for ${language}:`, layout);
         setCurrentLayout(layout.layout || layout);
       } catch (error) {
         console.error(`Error loading layout for ${language}:`, error);

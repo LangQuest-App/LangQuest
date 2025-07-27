@@ -3,6 +3,7 @@ import { Volume2 } from 'lucide-react';
 import LessonCompletion from './LessonCompletion';
 import MultilingualKeyboard from '../KeyBoard';
 import { useUser } from '@/ui/lib/contextStores/userStore';
+import { toast } from 'sonner';
 
 const AttemptLesson = ({ lesson }: any) => {
   const [current, setCurrent] = useState(0);
@@ -56,9 +57,38 @@ const AttemptLesson = ({ lesson }: any) => {
   };
 
   const playAudio = (url: string) => {
-    const audio = new Audio(url);
-    audio.play();
+    if (!url || url === 'TTS_URL_NOT_AVAILABLE') {
+      toast('No audio available for this question.', { description: 'Audio not found', position: 'bottom-right', duration: 2500 });
+      return;
+    }
+    const audioType = url.split('.').pop();
+    const audio = new Audio();
+    let mimeType = '';
+    if (audioType === 'mp3') mimeType = 'audio/mpeg';
+    else if (audioType === 'wav') mimeType = 'audio/wav';
+    else if (audioType === 'ogg') mimeType = 'audio/ogg';
+    if (mimeType && audio.canPlayType(mimeType) === '') {
+      toast('Audio format not supported in your browser.', { description: 'Cannot play this audio', position: 'bottom-right', duration: 2500 });
+      return;
+    }
+    try {
+      audio.src = url;
+      audio.play().catch(() => {
+        toast('Failed to play audio.', { description: 'Audio format not supported', position: 'bottom-right', duration: 2500 });
+      });
+    } catch (err) {
+      toast('Failed to play audio.', { description: 'Audio format not supported', position: 'bottom-right', duration: 2500 });
+    }
   };
+
+  React.useEffect(() => {
+    if (!q?.tts_url || q.tts_url === 'TTS_URL_NOT_AVAILABLE') {
+      toast('No audio available for this question.', { description: 'Audio not found', position: 'bottom-right', duration: 2500 });
+    } else {
+      playAudio(q.tts_url);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [current]);
 
   const q = questions[current];
 
