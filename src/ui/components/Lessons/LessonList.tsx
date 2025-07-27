@@ -4,7 +4,7 @@ import AttemptLesson from './AttemptLesson';
 import MistakesViewer from './MistakesViewer';
 
 const LessonList = () => {
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL!;
+  const BACKEND_URL = "https://langquest-backend.onrender.com";
   const [lessons, setLessons] = React.useState<Lesson[]>([]);
   const [attempting, setAttempting] = React.useState<number | null>(null);
   const [viewMistakesIdx, setViewMistakesIdx] = React.useState<number | null>(null);

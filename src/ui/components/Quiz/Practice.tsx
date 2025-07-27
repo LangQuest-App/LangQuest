@@ -9,7 +9,7 @@ type Mistake = {
   question: string;
   user_answer?: string;
   correct_answer?: string;
-  options?: string[];
+  options: string[];
   tts_url?: string;
   phonetic?: string;
   answer_type?: string;
@@ -31,7 +31,7 @@ const Practice = () => {
       setLoading(true);
       setError(null);
       try {
-        const BACKEND_URL = import.meta.env.VITE_BACKEND_URL!;
+        const BACKEND_URL = "https://langquest-backend.onrender.com";
         const response = await window.electronAPI.fetchData(
           `${BACKEND_URL}/lesson/get-all-mistakes`,
           {},
@@ -153,7 +153,7 @@ const Practice = () => {
             )}
             {mistakes[current].answer_type === 'multiple_choice' && Array.isArray(mistakes[current].options) && (
               <div className="flex flex-col gap-3 w-full mt-2">
-                {mistakes[current].options.map((opt: string, idx: number) => (
+                {mistakes[current].options.length >0 && mistakes[current].options.map((opt: string, idx: number) => (
                   <label key={idx} className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"

@@ -10,7 +10,7 @@ interface MistakesProps {
 }
 
 const MistakesViewer: React.FC<MistakesProps> = ({ lessonId, lesson }) => {
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL!;
+  const BACKEND_URL = "https://langquest-backend.onrender.com";
   const [mistakes, setMistakes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

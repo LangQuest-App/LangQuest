@@ -13,7 +13,7 @@ const Onborading = () => {
     options: string[];
   }
   const navigate = useNavigate();
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL!;
+  const BACKEND_URL = "https://langquest-backend.onrender.com";
   const [preferences, setPreferences] = React.useState<IUserPreference>({
     native_lang: "",
     language_to_learn: "",
@@ -65,8 +65,8 @@ const generateLessons = async (preferences:any) => {
       if( response.status !== 200) {
         throw new Error("Failed to fetch lessons");
       }
-      // console.log("Lessons fetched successfully:", response.data);
-      // console.log(response.data);
+      console.log("Lessons fetched successfully:", response.data);
+      console.log(response.data);
     } catch (error) {
       console.error('Error fetching lesson:', error);
     }
